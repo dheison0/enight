@@ -1,0 +1,40 @@
+package database
+
+import (
+	"api/models"
+	"database/sql"
+
+	_ "github.com/mattn/go-sqlite3"
+)
+
+var db *sql.DB
+
+func Init(path string) error {
+	var err error
+	db, err = sql.Open("sqlite", path)
+	// db can be better configured!
+	return err
+}
+
+func CreateLocation(location *models.Location) error {
+	return db.QueryRow(
+		"INSERT INTO locations(name, distance) VALUES (?, ?) RETURNING id;",
+		location.Name, location.Distance,
+	).Scan(location.ID)
+}
+
+func GetAllLocations() ([]models.Location, error) {
+	rows, err := db.Query("SELECT (id, name, distance) FROM locations;")
+	if err != nil {
+		return nil, err
+	}
+	var location models.Location
+	var locations []models.Location
+	for rows.Next() {
+		if err := rows.Scan(&location.ID, &location.Name, &location.Distance); err != nil {
+			return nil, err
+		}
+		locations = append(locations, location)
+	}
+	return locations, nil
+}
