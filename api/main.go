@@ -43,6 +43,7 @@ func main() {
 	{ // TODO: Add an authentication for some routes
 		apiRoute.POST("/locations", routes.CreateLocation)
 		apiRoute.GET("/locations", routes.GetAllLocations)
+		apiRoute.DELETE("/locations/:id", routes.DeleteLocation)
 	}
 
 	// put this shit to run and see what it will do

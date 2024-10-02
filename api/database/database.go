@@ -11,7 +11,7 @@ var db *sql.DB
 
 func Init(path string) error {
 	var err error
-	db, err = sql.Open("sqlite", path)
+	db, err = sql.Open("sqlite3", path)
 	// db can be better configured!
 	return err
 }
@@ -20,11 +20,16 @@ func CreateLocation(location *models.Location) error {
 	return db.QueryRow(
 		"INSERT INTO locations(name, distance) VALUES (?, ?) RETURNING id;",
 		location.Name, location.Distance,
-	).Scan(location.ID)
+	).Scan(&location.ID)
+}
+
+func DeleteLocation(location *models.Location) error {
+	_, err := db.Exec("DELETE FROM locations WHERE id = ?;", location.ID)
+	return err
 }
 
 func GetAllLocations() ([]models.Location, error) {
-	rows, err := db.Query("SELECT (id, name, distance) FROM locations;")
+	rows, err := db.Query("SELECT id, name, distance FROM locations;")
 	if err != nil {
 		return nil, err
 	}
