@@ -5,8 +5,22 @@ CREATE TABLE IF NOT EXISTS locations(
 );
 
 CREATE TABLE IF NOT EXISTS clients(
-  phone TEXT UNIQUE NOT NULL,
+  phone TEXT PRIMARY KEY NOT NULL,
   name TEXT NOT NULL,
   location_id INTEGER,
   FOREIGN KEY(location_id) REFERENCES locations(id)
+);
+
+CREATE TABLE IF NOT EXISTS products(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  cover_url TEXT
+);
+
+CREATE TABLE IF NOT EXISTS product_sizes(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  price NUMBER NOT NULL,
+  product_id INTEGER NOT NULL,
+  FOREIGN KEY(product_id) REFERENCES products(id) ON DELETE CASCADE
 );
