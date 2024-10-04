@@ -54,6 +54,7 @@ func main() {
 		apiRoute.POST("/products", routes.CreateProduct)
 		apiRoute.GET("/products/:id", routes.GetProduct)
 		apiRoute.DELETE("/products/:id", routes.DeleteProduct)
+		apiRoute.POST("/products/:id/sizes", routes.AddProductSize)
 		apiRoute.DELETE("/products/:id/sizes/:sid", routes.DeleteProductSize)
 	}
 

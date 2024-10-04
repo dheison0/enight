@@ -32,6 +32,25 @@ func CreateProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, product)
 }
 
+func AddProductSize(c *gin.Context) {
+	rawID := c.Param("id")
+	id, err := strconv.Atoi(rawID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id!"})
+		return
+	}
+	size := models.ProductSize{ProductID: id}
+	if err = c.ShouldBindJSON(&size); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "can't bind JSON to product size body! " + err.Error()})
+		return
+	}
+	if err = database.AddProductSize(&size); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to add product size! " + err.Error()})
+		return
+	}
+	c.Status(http.StatusOK)
+}
+
 func GetAllProducts(c *gin.Context) {
 	products, err := database.GetAllProducts()
 	if err != nil {
