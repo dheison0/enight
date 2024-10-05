@@ -27,4 +27,26 @@ ele podera enviar uma mensagem explicando o motivo.
 
 ## TODO
 
-  - Iniciar o projeto
+  - Criar sistema de configurações;
+  - Criar lista de compras feitas;
+  - Criar sistema de tokens para clientes(usando a memória RAM do sistema para
+    salvar as relações entre cliente e token)
+
+  - Criar todo o sistema da web e do bot no whatsapp.
+
+
+## Como rodar o sistema?
+
+Aqui eu uso um script para rodar tudo mas você pode rodar manualmente
+compilando o projeto web/ e a api/ criados em NodeJS 20 e go 1.23
+respectivamente, lembrando-se de definir algumas variáveis de ambiente na hora
+de rodar o servidor. Você pode usar um arquivo `.env` na pasta onde vai
+executar o comando ou na pasta anterior que ele vai carregar tudo
+automaticamente.
+
+As seguintes variáveis de ambiente são carregadas na hora de iniciar o servidor
+da API:
+
+  - `PORT` A porta onde o servidor vai ficar escutando;
+  - `WEB_FILES` Localização onde os arquivos das páginas web estão;
+  - `DB_PATH` Localização do arquivo de banco de dados SQLite3;
