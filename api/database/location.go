@@ -20,7 +20,7 @@ func GetAllLocations() ([]models.Location, error) {
 		return nil, err
 	}
 	var location models.Location
-	var locations []models.Location
+	locations := []models.Location{}
 	for rows.Next() {
 		if err := rows.Scan(&location.ID, &location.Name, &location.Distance); err != nil {
 			return nil, err
