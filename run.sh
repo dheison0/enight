@@ -1,24 +1,24 @@
 #!/usr/bin/env bash
 
-echo "Loading config..."
-source .env
-source api/.env
 
+function log() {
+  echo -e "[`date +%H:%M:%S`] $@"
+}
 
-echo "Configuring database..."
-echo "Running migrations..."
+[[ -e '.env' ]] && source .env
+[[ -e 'api/.env' ]] && source api/.env
+
+log "Running migrations..."
 for f in $(find api/migrations -type f); do
-  echo "Running for $f..."
-  sqlite3 $DB_PATH "$(<$f)"
+  log "\t $f..."
+  sqlite3 "$DB_PATH" < "$f" || exit
 done
 
-echo "Building web app..."
+log "Building all system..."
 cd web
-npm run build
+npm run build &>/dev/null &
+cd ../api
+go build -ldflags="-extldflags=-w -s" || exit
 cd ..
-
-echo "Building API server..."
-cd api
-go build
-cd ..
+log "Running server..."
 ./api/api
