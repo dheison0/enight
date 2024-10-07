@@ -24,3 +24,14 @@ CREATE TABLE IF NOT EXISTS product_sizes(
   product_id INTEGER NOT NULL,
   FOREIGN KEY(product_id) REFERENCES products(id) ON DELETE CASCADE
 );
+
+
+/* this table uses raw clients and products to avoid losing data when a client
+   or product is deleted */
+CREATE TABLE IF NOT EXISTS purchases(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  client TEXT NOT NULL,
+  price NUMERIC NOT NULL,
+  products TEXT NOT NULL,
+  stage TEXT NOT NULL DEFAULT "added"
+);
