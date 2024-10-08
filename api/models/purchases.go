@@ -20,10 +20,14 @@ type PurchaseRequest struct {
 	Stage       string                `json:"stage"`
 }
 
+type PurchaseListItem struct {
+	ID     int            `json:"id"`
+	Client ClientResponse `json:"client"`
+	Price  float64        `json:"price"`
+	Stage  string         `json:"stage"`
+}
+
 type PurchaseResponse struct {
-	ID       int                    `json:"id"`
-	Client   ClientResponse         `json:"client"`
+	PurchaseListItem
 	Products []PurchaseItemResponse `json:"products"`
-	Price    float64                `json:"price"`
-	Stage    string                 `json:"stage"`
 }

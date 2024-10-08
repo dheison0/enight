@@ -3,6 +3,7 @@ package database
 import (
 	"api/models"
 	"encoding/json"
+	"errors"
 )
 
 func CreatePurchase(purchase *models.PurchaseRequest) (models.PurchaseResponse, error) {
@@ -55,26 +56,35 @@ func getPurchaseItems(items []models.PurchaseItemRequest) ([]models.PurchaseItem
 	return purchaseItems, nil
 }
 
-func GetAllPurchases(offset, limit int) ([]models.PurchaseResponse, error) {
-	result := []models.PurchaseResponse{}
-	rows, err := db.Query("SELECT id, client, products, price, stage FROM purchases;")
+func GetAllPurchases(offset, limit int) (items []models.PurchaseListItem, err error) {
+	rows, err := db.Query("SELECT id, client, price, stage FROM purchases;")
 	if err != nil {
-		return result, err
+		return items, err
 	}
-	item := models.PurchaseResponse{}
+	item := models.PurchaseListItem{}
+	var client string
 	for rows.Next() {
-		var client string
-		var products string
-		if err = rows.Scan(&item.ID, &client, &products, &item.Price, &item.Stage); err != nil {
-			return result, err
-		}
-		if err = json.Unmarshal([]byte(client), &item.Client); err != nil {
+		if err = rows.Scan(&item.ID, &client, &item.Price, &item.Stage); err != nil {
+			break
+		} else if err = json.Unmarshal([]byte(client), &item.Client); err != nil {
 			break
 		}
-		if err = json.Unmarshal([]byte(products), &item.Products); err != nil {
-			break
-		}
-		result = append(result, item)
+		items = append(items, item)
 	}
-	return result, nil
+	return items, err
+}
+
+func GetPurchase(id int) (purchase models.PurchaseResponse, err error) {
+	purchase.ID = id
+	var client, products string
+	err = db.QueryRow("SELECT client, products, price, stage FROM purchases WHERE id = ?;", id).
+		Scan(&client, &products, &purchase.Price, &purchase.Stage)
+	if err != nil {
+		err = errors.New("failed to find item! " + err.Error())
+	} else if err = json.Unmarshal([]byte(client), &purchase.Client); err != nil {
+		err = errors.New("failed to parse client structure! " + err.Error())
+	} else if err = json.Unmarshal([]byte(products), &purchase.Products); err != nil {
+		err = errors.New("failed to parse products structure! " + err.Error())
+	}
+	return purchase, err
 }
