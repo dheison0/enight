@@ -21,10 +21,11 @@ type PurchaseRequest struct {
 }
 
 type PurchaseListItem struct {
-	ID     int            `json:"id"`
-	Client ClientResponse `json:"client"`
-	Price  float64        `json:"price"`
-	Stage  string         `json:"stage"`
+	ID        int            `json:"id"`
+	Client    ClientResponse `json:"client"`
+	Price     float64        `json:"price"`
+	Stage     string         `json:"stage"`
+	CreatedAt int64          `json:"created_at"`
 }
 
 type PurchaseResponse struct {

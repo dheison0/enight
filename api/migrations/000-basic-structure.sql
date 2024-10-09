@@ -34,5 +34,6 @@ CREATE TABLE IF NOT EXISTS purchases(
   client TEXT NOT NULL,
   price NUMERIC NOT NULL,
   products TEXT NOT NULL,
-  stage TEXT NOT NULL DEFAULT "added"
+  stage TEXT NOT NULL DEFAULT "added",
+  created_at INTEGER NOT NULL DEFAULT (unixepoch())
 );

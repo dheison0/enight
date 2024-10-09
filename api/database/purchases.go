@@ -23,9 +23,9 @@ func CreatePurchase(purchase *models.PurchaseRequest) (models.PurchaseResponse, 
 	productsJSON, _ := json.Marshal(result.Products)
 	result.Price = calculateTotalPrice(result.Products)
 	err = db.QueryRow(
-		"INSERT INTO purchases(client, products, price) VALUES (?, ?, ?) RETURNING id, stage;",
+		"INSERT INTO purchases(client, products, price) VALUES (?, ?, ?) RETURNING id, stage, created_at;",
 		string(clientJSON), string(productsJSON), result.Price,
-	).Scan(&result.ID, &result.Stage)
+	).Scan(&result.ID, &result.Stage, &result.CreatedAt)
 	return result, err
 }
 
@@ -58,14 +58,14 @@ func getPurchaseItems(items []models.PurchaseItemRequest) ([]models.PurchaseItem
 }
 
 func GetAllPurchases(offset, limit int) (items []models.PurchaseListItem, err error) {
-	rows, err := db.Query("SELECT id, client, price, stage FROM purchases;")
+	rows, err := db.Query("SELECT id, client, price, stage, created_at FROM purchases;")
 	if err != nil {
 		return items, err
 	}
 	item := models.PurchaseListItem{}
 	var client string
 	for rows.Next() {
-		if err = rows.Scan(&item.ID, &client, &item.Price, &item.Stage); err != nil {
+		if err = rows.Scan(&item.ID, &client, &item.Price, &item.Stage, &item.CreatedAt); err != nil {
 			break
 		} else if err = json.Unmarshal([]byte(client), &item.Client); err != nil {
 			break
@@ -78,8 +78,8 @@ func GetAllPurchases(offset, limit int) (items []models.PurchaseListItem, err er
 func GetPurchase(id int) (purchase models.PurchaseResponse, err error) {
 	purchase.ID = id
 	var client, products string
-	err = db.QueryRow("SELECT client, products, price, stage FROM purchases WHERE id = ?;", id).
-		Scan(&client, &products, &purchase.Price, &purchase.Stage)
+	err = db.QueryRow("SELECT client, products, price, stage, created_at FROM purchases WHERE id = ?;", id).
+		Scan(&client, &products, &purchase.Price, &purchase.Stage, &purchase.CreatedAt)
 	if err != nil {
 		err = errors.New("failed to find item! " + err.Error())
 	} else if err = json.Unmarshal([]byte(client), &purchase.Client); err != nil {
