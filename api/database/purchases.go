@@ -4,6 +4,7 @@ import (
 	"api/models"
 	"encoding/json"
 	"errors"
+	"fmt"
 )
 
 func CreatePurchase(purchase *models.PurchaseRequest) (models.PurchaseResponse, error) {
@@ -49,7 +50,7 @@ func getPurchaseItems(items []models.PurchaseItemRequest) ([]models.PurchaseItem
 			item.ItemID, item.SizeID,
 		).Scan(&toInsert.Name, &toInsert.CoverURL, &toInsert.SizeName, &toInsert.UnityPrice)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("item with id=%d and size id=%d not found", item.ItemID, item.SizeID)
 		}
 		purchaseItems = append(purchaseItems, toInsert)
 	}

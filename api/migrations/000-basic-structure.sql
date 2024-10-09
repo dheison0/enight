@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS clients(
 CREATE TABLE IF NOT EXISTS products(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
+  description TEXT,
   cover_url TEXT
 );
 

@@ -6,8 +6,8 @@ import (
 
 func CreateProduct(product *models.Product) error {
 	return db.QueryRow(
-		"INSERT INTO products(name, cover_url) VALUES (?, ?) RETURNING id;",
-		product.Name, product.CoverURL,
+		"INSERT INTO products(name, description, cover_url) VALUES (?, ?, ?) RETURNING id;",
+		product.Name, product.Description, product.CoverURL,
 	).Scan(&product.ID)
 }
 
@@ -48,8 +48,8 @@ func GetAllProducts() ([]models.Product, error) {
 func GetProduct(id int) (*models.ProductResponse, error) {
 	product := models.ProductResponse{}
 	product.ID = id
-	err := db.QueryRow("SELECT name, cover_url FROM products WHERE id = ?", id).
-		Scan(&product.Name, &product.CoverURL)
+	err := db.QueryRow("SELECT name, description, cover_url FROM products WHERE id = ?", id).
+		Scan(&product.Name, &product.Description, &product.CoverURL)
 	if err != nil {
 		return nil, err
 	}
