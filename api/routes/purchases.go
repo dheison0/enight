@@ -62,3 +62,24 @@ func GetPurchase(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, item)
 }
+
+func SetPurchaseStage(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id!"})
+		return
+	}
+	var purchase struct {
+		Stage string `json:"stage"`
+	}
+	if err = c.ShouldBindJSON(&purchase); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "can't bind purchase item!" + err.Error()})
+		return
+	}
+	err = database.SetPurchaseStage(id, purchase.Stage)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "can't update stage! " + err.Error()})
+		return
+	}
+	c.Status(http.StatusOK)
+}

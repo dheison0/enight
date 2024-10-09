@@ -60,6 +60,7 @@ func main() {
 		apiRoute.POST("/purchases", routes.CreatePurchase)
 		apiRoute.GET("/purchases", routes.GetAllPurchases)
 		apiRoute.GET("/purchases/:id", routes.GetPurchase)
+		apiRoute.PUT("/purchases/:id", routes.SetPurchaseStage)
 	}
 
 	// put this shit to run and see what it will do

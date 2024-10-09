@@ -88,3 +88,8 @@ func GetPurchase(id int) (purchase models.PurchaseResponse, err error) {
 	}
 	return purchase, err
 }
+
+func SetPurchaseStage(id int, stage string) error {
+	_, err := db.Exec("UPDATE purchases SET stage = ? WHERE id = ?;", stage, id)
+	return err
+}

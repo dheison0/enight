@@ -30,7 +30,9 @@ func GetAllClients() ([]models.ClientDatabase, error) {
 func GetClient(phone string) (*models.ClientResponse, error) {
 	clientResponse := models.ClientResponse{Phone: phone}
 	err := db.QueryRow(
-		"SELECT clients.name, locations.id, locations.name, locations.distance FROM clients INNER JOIN locations ON locations.id = clients.location_id WHERE clients.phone = ?;",
+		`SELECT clients.name, locations.id, locations.name, locations.distance
+		 FROM clients INNER JOIN locations ON locations.id = clients.location_id
+		 WHERE clients.phone = ?;`,
 		phone,
 	).Scan(
 		&clientResponse.Name, &clientResponse.Location.ID,

@@ -53,7 +53,10 @@ func GetProduct(id int) (*models.ProductResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	rows, err := db.Query("SELECT id, name, price FROM product_sizes WHERE product_id = ?;", product.ID)
+	rows, err := db.Query(
+		"SELECT id, name, price FROM product_sizes WHERE product_id = ?;",
+		product.ID,
+	)
 	if err != nil {
 		return nil, err
 	}
