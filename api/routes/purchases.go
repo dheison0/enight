@@ -41,7 +41,7 @@ func GetAllPurchases(c *gin.Context) {
 			return
 		}
 	}
-	items, err := database.GetAllPurchases(offset, limit)
+	items, err := database.GetAllPurchases(offset, limit, c.Query("search"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "can't get purhase items! " + err.Error()})
 		return

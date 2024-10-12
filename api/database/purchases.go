@@ -2,6 +2,7 @@ package database
 
 import (
 	"api/models"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -57,8 +58,19 @@ func getPurchaseItems(items []models.PurchaseItemRequest) ([]models.PurchaseItem
 	return purchaseItems, nil
 }
 
-func GetAllPurchases(offset, limit int) (items []models.PurchaseListItem, err error) {
-	rows, err := db.Query("SELECT id, client, price, stage, created_at FROM purchases;")
+func GetAllPurchases(offset, limit int, search string) ([]models.PurchaseListItem, error) {
+	var items = []models.PurchaseListItem{}
+	var rows *sql.Rows
+	var err error
+	if search == "" {
+		rows, err = db.Query("SELECT id, client, price, stage, created_at FROM purchases;")
+	} else {
+		rows, err = db.Query(
+			`SELECT id, client, price, stage, created_at
+			 FROM purchases WHERE client LIKE '%' || ? || '%' OR stage = ?;`,
+			search, search,
+		)
+	}
 	if err != nil {
 		return items, err
 	}
