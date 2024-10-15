@@ -28,10 +28,7 @@ ele podera enviar uma mensagem explicando o motivo.
 ## TODO
 
   - Criar sistema de configurações;
-  - Criar lista de compras feitas;
-  - Criar sistema de tokens para clientes(usando a memória RAM do sistema para
-    salvar as relações entre cliente e token)
-
+  - Adicionar sistema de autenticação na API;
   - Criar todo o sistema da web e do bot no whatsapp.
 
 
