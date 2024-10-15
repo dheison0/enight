@@ -10,17 +10,29 @@ import (
 )
 
 func CreatePurchase(c *gin.Context) {
-	request := models.PurchaseRequest{}
+	var request struct {
+		Token string `json:"token"`
+		models.PurchaseRequest
+	}
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to bind purchase info! " + err.Error()})
 		return
 	}
-	response, err := database.CreatePurchase(&request)
+	// re-write ClientPhone after binding request to avoid set it on request
+	// avoiding to create many purchases without the client need
+	request.ClientPhone = getTokenPhone(request.Token)
+	if request.ClientPhone == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "token not found!"})
+		return
+	}
+	response, err := database.CreatePurchase(&request.PurchaseRequest)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "can't insert your purchase into database! " + err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, response)
+	// delete token from availables after using it to avoid many purchases
+	deleteToken(request.Token)
 }
 
 func GetAllPurchases(c *gin.Context) {

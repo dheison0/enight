@@ -61,6 +61,9 @@ func main() {
 		apiRoute.GET("/purchases", routes.GetAllPurchases)
 		apiRoute.GET("/purchases/:id", routes.GetPurchase)
 		apiRoute.PUT("/purchases/:id", routes.SetPurchaseStage)
+
+		apiRoute.POST("/tokens", routes.CreateToken)
+		apiRoute.GET("/tokens/:id", routes.GetTokenUser)
 	}
 
 	// put this shit to run and see what it will do
