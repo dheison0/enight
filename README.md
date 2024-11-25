@@ -47,3 +47,4 @@ da API:
   - `PORT` A porta onde o servidor vai ficar escutando;
   - `WEB_FILES` Localização onde os arquivos das páginas web estão;
   - `DB_PATH` Localização do arquivo de banco de dados SQLite3;
+  - `BOT_DB_PATH` A localização do banco de dados onde vai ficar armazenado as informações de login go bot.

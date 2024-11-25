@@ -1,6 +1,6 @@
 package database
 
-import "api/models"
+import "server/models"
 
 func CreateLocation(location *models.Location) error {
 	return db.QueryRow(

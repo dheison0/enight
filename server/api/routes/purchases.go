@@ -1,9 +1,9 @@
 package routes
 
 import (
-	"api/database"
-	"api/models"
 	"net/http"
+	"server/database"
+	"server/models"
 	"strconv"
 
 	"github.com/gin-gonic/gin"

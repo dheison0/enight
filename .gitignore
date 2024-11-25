@@ -1,5 +1,7 @@
-api/api
 web/node_modules
 web/dist
+server/server
+
 .env
-db.sqlite3
+*.sqlite3
+*tmp*

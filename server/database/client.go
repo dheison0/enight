@@ -1,6 +1,6 @@
 package database
 
-import "api/models"
+import "server/models"
 
 func CreateClient(client *models.ClientDatabase) error {
 	_, err := db.Exec(

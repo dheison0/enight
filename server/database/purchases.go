@@ -1,11 +1,11 @@
 package database
 
 import (
-	"api/models"
 	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"server/models"
 )
 
 func CreatePurchase(purchase *models.PurchaseRequest) (models.PurchaseResponse, error) {

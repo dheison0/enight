@@ -1,7 +1,7 @@
 package database
 
 import (
-	"api/models"
+	"server/models"
 )
 
 func CreateProduct(product *models.Product) error {
