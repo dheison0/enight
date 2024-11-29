@@ -8,6 +8,7 @@ import (
 
 	"github.com/mdp/qrterminal"
 	"go.mau.fi/whatsmeow"
+	"go.mau.fi/whatsmeow/store"
 	"go.mau.fi/whatsmeow/store/sqlstore"
 	waLog "go.mau.fi/whatsmeow/util/log"
 )
@@ -21,45 +22,54 @@ func Start(debug bool) {
 	if debug {
 		logLevel = "DEBUG"
 	}
-	botLog := waLog.Stdout("Bot", logLevel, false)
-	dbLog := waLog.Stdout("Bot database", logLevel, false)
+	device, err := setupDatabase(logLevel).GetFirstDevice()
+	if err != nil {
+		panic("failed to get first device! " + err.Error())
+	}
+	client := setupWhatsappClient(logLevel, device)
+	client.AddEventHandler(EventHandler)
+	log.Println("Bot started!")
+}
 
-	// Connect to database that will store the session
+func setupDatabase(logLevel string) *sqlstore.Container {
+	dbLog := waLog.Stdout("Bot database", logLevel, false)
 	botDBPath := os.Getenv("BOT_DB_PATH")
+	if botDBPath == "" {
+		botDBPath = "./bot.sqlite3"
+		log.Println("BOT_DB_PATH not provided, using ./bot.sqlite3")
+	}
 	container, err := sqlstore.New("sqlite3", fmt.Sprintf("file:%s?_foreign_keys=on", botDBPath), dbLog)
 	if err != nil {
 		panic("failed to create bot database container! " + err.Error())
 	}
-	deviceStore, err := container.GetFirstDevice()
-	if err != nil {
-		panic("failed to get first device! " + err.Error())
-	}
+	return container
+}
 
-	// Connect to WhatsApp
-	client = whatsmeow.NewClient(deviceStore, botLog)
+func setupWhatsappClient(logLevel string, device *store.Device) *whatsmeow.Client {
+	botLog := waLog.Stdout("Bot", logLevel, false)
+	client = whatsmeow.NewClient(device, botLog)
 	if client.Store.ID == nil {
-		// No login detected
+		botLog.Warnf("No login detected! Starting QR flow...")
 		qrChan, _ := client.GetQRChannel(context.Background())
-		err = client.Connect()
+		err := client.Connect()
 		if err != nil {
 			panic("failed to connect bot! " + err.Error())
 		}
 		for event := range qrChan {
 			if event.Event == "code" {
-				botLog.Infof("New QR code received")
+				botLog.Warnf("New QR code received")
 				qrterminal.GenerateHalfBlock(event.Code, qrterminal.L, os.Stdout)
 			} else {
-				botLog.Infof("Event received: %s", event.Event)
+				botLog.Warnf("Event received: %s", event.Event)
 			}
 		}
 	} else {
-		err = client.Connect()
+		err := client.Connect()
 		if err != nil {
 			panic("failed to connect bot! " + err.Error())
 		}
 	}
-	client.AddEventHandler(EventHandler)
-	log.Println("Bot started!")
+	return client
 }
 
 func Stop() {

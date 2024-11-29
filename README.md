@@ -1,7 +1,8 @@
 # Enight
 
-Este é um projeto feito para uma hamburgueria local criado por apenas um desenvolvedor,
-não espere que seja grande coisa e nem que ele consiga fazer de tudo.
+Este é um projeto feito para uma hamburgueria local criado por apenas um
+desenvolvedor, não espere que seja grande coisa e nem que ele consiga fazer
+de tudo.
 
 ## Como o sistema deve funcionar
 
@@ -34,17 +35,20 @@ ele podera enviar uma mensagem explicando o motivo.
 
 ## Como rodar o sistema?
 
-Aqui eu uso um script para rodar tudo mas você pode rodar manualmente
-compilando o projeto web/ e a api/ criados em NodeJS 20 e go 1.23
-respectivamente, lembrando-se de definir algumas variáveis de ambiente na hora
-de rodar o servidor. Você pode usar um arquivo `.env` na pasta onde vai
-executar o comando ou na pasta anterior que ele vai carregar tudo
-automaticamente.
+O sistema pode ser iniciado usando o script `run.sh` ou então você pode
+compilar o servidor que está na pasta `server/` usando o Go 1.23 e a interface
+web que está na pasta `web/` usando o NodeJS 20.18, depois disso é preciso
+definir as váriaveis de ambiente citadas abaixo e rodar as migrações dos modelos
+de dados que estão na pasta `server/database/migrations`, isso pode ser feito
+usando a interface CLI do SQLite 3 usando o comando `sqlite3`.
 
-As seguintes variáveis de ambiente são carregadas na hora de iniciar o servidor
-da API:
+As seguintes váriaveis de ambiente são carregadas na inicialização de todo
+sistema, elas podem ser definidas em um arquivo `.env` que sera carregado:
 
-  - `PORT` A porta onde o servidor vai ficar escutando;
-  - `WEB_FILES` Localização onde os arquivos das páginas web estão;
+  - `SERVER_PORT` A porta onde o servidor vai ficar escutando;
+  - `WEB_FILES_PATH` Localização onde os arquivos das páginas web estão;
   - `DB_PATH` Localização do arquivo de banco de dados SQLite3;
-  - `BOT_DB_PATH` A localização do banco de dados onde vai ficar armazenado as informações de login go bot.
+  - `BOT_DB_PATH` A localização do banco de dados onde vai ficar armazenado as
+    informações de login go bot;
+  - `DEBUG` Define se os sistema está no modo de depuração(ativo por padrão, 
+    "false" desativa).

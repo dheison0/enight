@@ -2,30 +2,40 @@ package api
 
 import (
 	"log"
+	"os"
 	"server/api/routes"
 
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 )
 
-func Start(addr, webFiles string, debug bool) error {
+func Start(debug bool) error {
 	log.Println("Creating server...")
 	if !debug {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	server := gin.Default()
 
-	// this will serve a ReactJS application statically
-	server.Use(static.Serve("/", static.LocalFile(webFiles, true)))
+	webFiles := os.Getenv("WEB_FILES_PATH")
+	if webFiles == "" {
+		webFiles = "./www"
+		log.Println("WEB_FILES_PATH not provided, using ./www")
+	}
+	// it'll serve a ReactJS application statically
+	server.NoRoute(static.Serve("/", static.LocalFile(webFiles, true)))
 
-	// this route can be used for testing porpuses
+	// this can be used for testing porpuses
 	server.GET("/ping", routes.Ping)
 
-	// from there we will define all routes of the api endpoint
 	apiRoute := server.Group("/api")
 	registerAPIRoutes(apiRoute)
-	log.Print("Starting server...")
-	return server.Run(addr)
+	log.Println("Starting server...")
+	port := os.Getenv("SERVER_PORT")
+	if port == "" {
+		port = "8080"
+		log.Println("SERVER_PORT not provided, using 8080")
+	}
+	return server.Run(":" + port)
 }
 
 func registerAPIRoutes(g *gin.RouterGroup) {
