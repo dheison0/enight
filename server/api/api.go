@@ -5,6 +5,7 @@ import (
 	"os"
 	"server/api/routes"
 
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 )
@@ -15,6 +16,10 @@ func Start(debug bool) error {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	server := gin.Default()
+	server.Use(gzip.Gzip(
+		gzip.DefaultCompression,
+		gzip.WithExcludedPaths([]string{"/api/"}),
+	))
 
 	webFiles := os.Getenv("WEB_FILES_PATH")
 	if webFiles == "" {
