@@ -1,13 +1,20 @@
 package database
 
 import (
+	"crypto/sha256"
 	"database/sql"
 	"embed"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 
 	_ "github.com/mattn/go-sqlite3"
+)
+
+const (
+	DEFAULT_PASSWORD       = "admin"
+	DEFAULT_SHIPPING_PRICE = 1
 )
 
 var db *sql.DB
@@ -59,7 +66,21 @@ func runMigrations() error {
 }
 
 func insertInitialValues() error {
-	// TODO: insert initial values
+	settings, err := GetSettings()
+	if err != nil && err != sql.ErrNoRows {
+		return err
+	}
+	if settings.PasswordHash == "" {
+		log.Println("Inserting settings into database...")
+		hash := sha256.Sum256([]byte(DEFAULT_PASSWORD))
+		_, err = db.Exec(
+			"INSERT INTO settings(shipping_price, password_hash) VALUES(?, ?);",
+			DEFAULT_SHIPPING_PRICE, fmt.Sprintf("%x", hash),
+		)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

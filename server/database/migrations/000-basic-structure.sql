@@ -26,9 +26,8 @@ CREATE TABLE IF NOT EXISTS product_sizes(
   FOREIGN KEY(product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 
-
 /* this table uses raw clients and products to avoid losing data when a client
-   or product is deleted */
+ or product is deleted */
 CREATE TABLE IF NOT EXISTS purchases(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   client TEXT NOT NULL,
@@ -37,3 +36,8 @@ CREATE TABLE IF NOT EXISTS purchases(
   stage TEXT NOT NULL DEFAULT "added",
   created_at INTEGER NOT NULL DEFAULT (unixepoch())
 );
+
+CREATE TABLE IF NOT EXISTS settings(
+  shipping_price NUMERIC NOT NULL DEFAULT 1,
+  password_hash TEXT NOT NULL
+)

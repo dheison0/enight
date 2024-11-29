@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"server/api/routes"
+	"server/extra"
 
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/contrib/static"
@@ -21,6 +22,13 @@ func Start(debug bool) error {
 		gzip.WithExcludedPaths([]string{"/api/"}),
 	))
 
+	jwtToken := os.Getenv("JWT_TOKEN")
+	if jwtToken == "" {
+		jwtToken = extra.RandomString(16)
+		log.Println("JWT_TOKEN not provided, using random secret")
+	}
+	routes.SetJwtToken(jwtToken)
+
 	webFiles := os.Getenv("WEB_FILES_PATH")
 	if webFiles == "" {
 		webFiles = "./www"
@@ -30,7 +38,7 @@ func Start(debug bool) error {
 	server.NoRoute(static.Serve("/", static.LocalFile(webFiles, true)))
 
 	// this can be used for testing porpuses
-	server.GET("/ping", routes.Ping)
+	server.GET("/ping", routes.AuthMiddleware(), routes.Ping)
 
 	apiRoute := server.Group("/api")
 	registerAPIRoutes(apiRoute)
@@ -44,6 +52,8 @@ func Start(debug bool) error {
 }
 
 func registerAPIRoutes(g *gin.RouterGroup) {
+	g.POST("/login", routes.Login)
+
 	g.POST("/locations", routes.CreateLocation)
 	g.GET("/locations", routes.GetAllLocations)
 	g.DELETE("/locations/:id", routes.DeleteLocation)
