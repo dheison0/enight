@@ -29,3 +29,12 @@ func GetAllLocations() ([]models.Location, error) {
 	}
 	return locations, nil
 }
+
+func GetLocation(id int) (*models.Location, error) {
+	location := models.Location{ID: id}
+	err := db.QueryRow(
+		"SELECT name, distance FROM locations WHERE id = ?;",
+		id,
+	).Scan(&location.Name, &location.Distance)
+	return &location, err
+}
