@@ -22,10 +22,10 @@ func CheckPassword(password string) bool {
 	return settings.PasswordHash == fmt.Sprintf("%x", hash)
 }
 
-func SetPassword(password string) bool {
+func SetPassword(password string) error {
 	hash := sha256.Sum256([]byte(password))
 	_, err := db.Exec("UPDATE settings SET password_hash = ?;", fmt.Sprintf("%x", hash))
-	return err == nil
+	return err
 }
 
 func SetShippingPrice(price float64) error {
