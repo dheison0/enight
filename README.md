@@ -51,4 +51,7 @@ sistema, elas podem ser definidas em um arquivo `.env` que sera carregado:
   - `BOT_DB_PATH` A localização do banco de dados onde vai ficar armazenado as
     informações de login go bot;
   - `DEBUG` Define se os sistema está no modo de depuração(ativo por padrão, 
-    "false" desativa).
+    "false" desativa);
+  - `JWT_TOKEN` Pode ser usado durante o desenvolvimento para evitar a
+    nessecidade de refazer o login toda vez que o sistema é reiniciado já que
+    se não definido é usado um token aleatório.
