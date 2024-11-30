@@ -54,26 +54,26 @@ func Start(debug bool) error {
 func registerAPIRoutes(g *gin.RouterGroup) {
 	g.POST("/login", routes.Login)
 
-	g.POST("/locations", routes.CreateLocation)
+	g.POST("/locations", routes.AuthMiddleware(), routes.CreateLocation)
 	g.GET("/locations", routes.GetAllLocations)
 	g.DELETE("/locations/:id", routes.DeleteLocation)
 
-	g.GET("/clients", routes.GetAllClients)
-	g.POST("/clients", routes.CreateClient)
+	g.GET("/clients", routes.AuthMiddleware(), routes.GetAllClients)
+	g.POST("/clients", routes.AuthMiddleware(), routes.CreateClient)
 	g.GET("/clients/:phone", routes.GetClient)
 	g.DELETE("/clients/:phone", routes.DeleteClient)
 
 	g.GET("/products", routes.GetAllProducts)
-	g.POST("/products", routes.CreateProduct)
+	g.POST("/products", routes.AuthMiddleware(), routes.CreateProduct)
 	g.GET("/products/:id", routes.GetProduct)
-	g.DELETE("/products/:id", routes.DeleteProduct)
-	g.POST("/products/:id/sizes", routes.AddProductSize)
-	g.DELETE("/products/:id/sizes/:sid", routes.DeleteProductSize)
+	g.DELETE("/products/:id", routes.AuthMiddleware(), routes.DeleteProduct)
+	g.POST("/products/:id/sizes", routes.AuthMiddleware(), routes.AddProductSize)
+	g.DELETE("/products/:id/sizes/:sid", routes.AuthMiddleware(), routes.DeleteProductSize)
 
 	g.POST("/purchases", routes.CreatePurchase)
-	g.GET("/purchases", routes.GetAllPurchases)
-	g.GET("/purchases/:id", routes.GetPurchase)
-	g.PUT("/purchases/:id", routes.SetPurchaseStage)
+	g.GET("/purchases", routes.AuthMiddleware(), routes.GetAllPurchases)
+	g.GET("/purchases/:id", routes.AuthMiddleware(), routes.GetPurchase)
+	g.PUT("/purchases/:id", routes.AuthMiddleware(), routes.SetPurchaseStage)
 
 	g.POST("/tokens", routes.CreateToken)
 	g.GET("/tokens/:id", routes.GetTokenUser)
