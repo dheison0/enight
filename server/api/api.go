@@ -3,6 +3,7 @@ package api
 import (
 	"log"
 	"os"
+	"path"
 	"server/api/routes"
 	"server/extra"
 
@@ -35,7 +36,10 @@ func Start(debug bool) error {
 		log.Println("WEB_FILES_PATH not provided, using ./www")
 	}
 	// it'll serve a ReactJS application statically
-	server.NoRoute(static.Serve("/", static.LocalFile(webFiles, true)))
+	server.Use(static.Serve("/", static.LocalFile(webFiles, true)))
+	server.NoRoute(func(c *gin.Context) {
+		c.File(path.Join(webFiles, "index.html"))
+	})
 
 	// this can be used for testing porpuses
 	server.GET("/ping", routes.AuthMiddleware(), routes.Ping)
