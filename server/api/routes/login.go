@@ -27,10 +27,11 @@ func Login(c *gin.Context) {
 	}
 
 	// Create a new token object, specifying signing method and the claims
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"password": password,
-		"exp":      time.Now().Add(AUTH_LIFETIME).Unix(), // Token expiration time
-	})
+	expiresAt := time.Now().Add(AUTH_LIFETIME).Unix()
+	token := jwt.NewWithClaims(
+		jwt.SigningMethodHS256,
+		jwt.MapClaims{"password": password, "exp": expiresAt},
+	)
 
 	// Sign and get the complete encoded token as a string
 	tokenString, err := token.SignedString([]byte(jwtToken))
@@ -39,7 +40,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": tokenString})
+	c.JSON(http.StatusOK, gin.H{"token": tokenString, "expires_at": expiresAt})
 }
 
 func AuthMiddleware() gin.HandlerFunc {
