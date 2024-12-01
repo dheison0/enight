@@ -19,9 +19,15 @@ func SetJwtToken(token string) {
 }
 
 func Login(c *gin.Context) {
-	password := c.PostForm("password")
+	var auth struct {
+		Password string `json:"password"`
+	}
+	if err := c.ShouldBindJSON(&auth); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "can't parse request body"})
+		return
+	}
 
-	if !database.CheckPassword(password) {
+	if !database.CheckPassword(auth.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "incorrect password"})
 		return
 	}
@@ -30,7 +36,7 @@ func Login(c *gin.Context) {
 	expiresAt := time.Now().Add(AUTH_LIFETIME).Unix()
 	token := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
-		jwt.MapClaims{"password": password, "exp": expiresAt},
+		jwt.MapClaims{"password": auth.Password, "exp": expiresAt},
 	)
 
 	// Sign and get the complete encoded token as a string
