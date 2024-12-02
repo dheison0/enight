@@ -7,11 +7,12 @@ import AdminBase from './pages/admin/base.tsx'
 import Orders from './pages/admin/orders/index.tsx'
 import Login from './pages/admin/login/index.tsx'
 import Home from './pages/home.tsx'
+import { loader as adminBaseLoader } from './pages/admin/actions.tsx'
 
 const router = createBrowserRouter(createRoutesFromElements(
   <Route element={<Base />} path="/">
     <Route index={true} element={<Home />} />
-    <Route path="admin" element={<AdminBase />}>
+    <Route path="admin" element={<AdminBase />} loader={adminBaseLoader}>
       <Route index={true} element={<Login />} />
       <Route path="orders" element={<Orders />} />
     </Route>

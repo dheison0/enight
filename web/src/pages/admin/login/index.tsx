@@ -1,13 +1,10 @@
 import { useRef, useState } from "react"
 import { login } from "../../../api"
-import { useParams, Navigate } from "react-router-dom"
 
 const Login = () => {
-  const refPath = useParams().ref
   const passwordRef = useRef<HTMLInputElement>(null)
   const [borderColor, setBorderColor] = useState("border-blue-200")
   const [processing, setProcessing] = useState(false)
-  const [loggedIn, setLoggedIn] = useState(false)
 
   const onLoginPress = () => {
     setProcessing(true)
@@ -18,7 +15,7 @@ const Login = () => {
     }
     const onSuccess = (ok: boolean) => {
       if (ok) {
-        setLoggedIn(true)
+        location.reload()
       } else {
         onError("Incorrect password!")
       }
@@ -29,7 +26,6 @@ const Login = () => {
   return (
     <div className="flex flex-1 items-center justify-center">
       <div className="bg-zinc-600 p-4 rounded-lg">
-        {loggedIn ? <Navigate to={refPath || "/admin/orders"} /> : <></>}
         <h1 className="flex flex-1 justify-center">
           Fazer login
         </h1>
