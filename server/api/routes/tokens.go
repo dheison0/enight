@@ -1,59 +1,22 @@
 package routes
 
 import (
+	"log"
 	"net/http"
 	"server/database"
-	"server/extra"
-	"time"
+	"server/tokens"
 
 	"github.com/gin-gonic/gin"
 )
 
-var tokens = map[string]string{}
-var tokenLifetime = time.Minute * 60
-
-func deleteToken(id string) {
-	delete(tokens, id)
-}
-
-func deleteTokenAfterLifetime(id string) {
-	<-time.After(tokenLifetime)
-	deleteToken(id)
-}
-
-func getTokenPhone(token string) string {
-	t, ok := tokens[token]
-	if !ok {
-		return ""
-	}
-	return t
-}
-
-func CreateToken(c *gin.Context) {
-	var clientData struct {
-		Phone string `json:"phone"`
-		Token string `json:"token"`
-	}
-	if err := c.ShouldBindJSON(&clientData); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "can't bind request JSON! " + err.Error()})
-		return
-	}
-	clientData.Token = extra.RandomString(8)
-	tokens[clientData.Token] = clientData.Phone
-	c.JSON(http.StatusOK, clientData)
-	go deleteTokenAfterLifetime(clientData.Token)
-}
-
 func GetTokenUser(c *gin.Context) {
-	phone, ok := tokens[c.Param("id")]
-	if !ok {
-		c.JSON(http.StatusNotFound, gin.H{"error": "token not found!"})
-		return
-	}
-	user, err := database.GetClient(phone)
+	tokenID := c.Param("id")
+	user := tokens.GetUser(tokenID)
+	client, err := database.GetClient(user)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get user! " + err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get client!"})
+		log.Printf("Can't get client from database! Client: %s Error: %s", user, err.Error())
 		return
 	}
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, client)
 }

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"server/database"
 	"server/models"
+	"server/tokens"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -20,7 +21,7 @@ func CreatePurchase(c *gin.Context) {
 	}
 	// re-write ClientPhone after binding request to avoid set it on request
 	// avoiding to create many purchases without the client need
-	request.ClientPhone = getTokenPhone(request.Token)
+	request.ClientPhone = tokens.GetUser(request.Token)
 	if request.ClientPhone == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "token not found!"})
 		return
@@ -32,7 +33,7 @@ func CreatePurchase(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, response)
 	// delete token from availables after using it to avoid many purchases
-	deleteToken(request.Token)
+	tokens.Delete(request.Token)
 }
 
 func GetAllPurchases(c *gin.Context) {

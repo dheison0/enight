@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"log"
 	"server/database"
+	"server/extra"
 	"server/models"
+	"server/tokens"
 	"strconv"
 
 	"go.mau.fi/whatsmeow/types/events"
@@ -18,44 +20,91 @@ type NewClient struct {
 var newClients = map[string]*NewClient{}
 var chatStages = map[string]string{}
 
+// EventHandler handles all incoming events from whatsapp and choose
+// what to do with it
 func EventHandler(event any) {
 	switch v := event.(type) {
 	case *events.Message:
 		if v.Info.IsFromMe || v.Info.IsGroup {
 			return
 		}
-		log.Printf("New message from %s: %+v\n", v.Info.Sender.User, v.Message.GetConversation())
-		client, err := database.GetClient(v.Info.Sender.User)
-		if err != nil {
+		user := v.Info.Sender.User
+
+		if chatStages[user] == "new" { // this is being used to avoid unneeded database query
 			RegisterNewClient(v)
 			return
 		}
-		stage, ok := chatStages[v.Info.Sender.User]
-		if !ok {
-			chatStages[v.Info.Sender.User] = "normal"
-			stage = "normal"
+
+		// check if it's a new client or a old one
+		client, err := database.GetClient(user)
+		if err == nil && chatStages[user] == "" {
+			chatStages[user] = "normal"
+		} else if err != nil {
+			chatStages[user] = "new"
+			RegisterNewClient(v)
+			return
 		}
-		switch stage {
-		case "normal":
-			sendText(v, "Olá "+client.Name+"!"+"\n\nO que deseja fazer?\n1 - Novo pedido\n2 - Cancelar pedido\n2 - Conversar com um atendente")
-			markRead(v)
-		}
+
+		CommandByStage(v, user, client)
+	}
+}
+
+func CommandByStage(m *events.Message, user string, client *models.ClientResponse) {
+	switch chatStages[user] {
+	case "normal":
+		sendText(
+			m,
+			extra.Dedent(fmt.Sprintf(`
+        Olá %s!
+        O que deseja fazer?
+        
+        1 - Novo pedido
+        2 - Cancelar pedido
+        3 - Conversar com um atendente`,
+				client.Name,
+			)),
+		)
+		markRead(m)
+		chatStages[user] = "command"
+	case "command":
+		menuCommand(m, user, client)
+	case "chat":
+		return
+	}
+}
+
+func menuCommand(m *events.Message, user string, client *models.ClientResponse) {
+	cmd := m.Message.GetConversation()
+	switch cmd {
+	case "1":
+		token := tokens.Create(user)
+		sendText(m, fmt.Sprintf("Acesse o link a seguir para escolher os produtos! http://0.0.0.0:8080/b/%s", token))
+		markRead(m)
+	case "2":
+		sendText(m, "TODO!")
+		markRead(m)
+	case "3":
+		sendText(m, "Ok, agora você vai falar diretamento com o atendente!")
+		chatStages[user] = "chat"
+	default:
+		chatStages[user] = "normal"
+		CommandByStage(m, user, client)
 	}
 }
 
 func RegisterNewClient(m *events.Message) {
-	phone := m.Info.Sender.User
-	if _, ok := newClients[phone]; !ok {
-		newClients[phone] = &NewClient{
+	user := m.Info.Sender.User
+	if _, ok := newClients[user]; !ok {
+		newClients[user] = &NewClient{
 			Client: models.ClientResponse{
-				Phone:    phone,
+				Phone:    user,
 				Name:     m.Info.PushName,
 				Location: models.Location{},
 			},
 			Stage: "name",
 		}
 	}
-	client := newClients[phone]
+	client := newClients[user]
 	switch client.Stage {
 	case "name":
 		sendText(m, "Olá, você é novo(a) por aqui! Qual é o seu nome?")
@@ -94,22 +143,19 @@ func RegisterNewClient(m *events.Message) {
 		}
 		client.Client.Location = *location
 		err = database.CreateClient(&models.ClientDatabase{
-			Phone:      phone,
+			Phone:      user,
 			Name:       client.Client.Name,
 			LocationID: client.Client.Location.ID,
 		})
+		delete(newClients, user)
 		if err == nil {
 			sendText(m, "Obrigado por se registrar! 😉")
-			delete(newClients, phone)
+			chatStages[user] = "normal"
 			EventHandler(m)
 		} else {
 			sendText(m, "Houve um erro ao criar o seu cadastro. Esse chat passará a ser usado para conversar com um atendente!")
-			client.Stage = "chat"
-			break
+			chatStages[user] = "chat"
 		}
-
-	case "chat":
-		return
 	}
 	markRead(m)
 }
