@@ -10,6 +10,7 @@ import { loader as adminBaseLoader } from './pages/admin/actions.tsx'
 import { Locations } from './pages/admin/locations/index.tsx'
 import { NewLocation } from './pages/admin/locations/new/index.tsx'
 import { Clients } from './pages/admin/clients/index.tsx'
+import { ClientView } from './pages/admin/clients/view/index.tsx'
 
 const router = createBrowserRouter(createRoutesFromElements(
   <Route element={<Base />} path="/">
@@ -19,6 +20,7 @@ const router = createBrowserRouter(createRoutesFromElements(
       <Route path="locations" element={<Locations />} />
       <Route path="locations/new" element={<NewLocation />} />
       <Route path="clients" element={<Clients />} />
+      <Route path="clients/:phone" element={<ClientView />} />
     </Route>
   </Route>
 ))

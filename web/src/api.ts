@@ -59,3 +59,8 @@ export async function getAllClients(): Promise<[number, Client[] | Error]> {
   const response = await request("GET", "/clients")
   return [response.status, await response.json()]
 }
+
+export async function getClient(phone: string): Promise<[number, Client | Error]> {
+  const response = await request("GET", "/clients/" + phone)
+  return [response.status, await response.json()]
+}
