@@ -16,7 +16,7 @@ const Base = () => (
     <main className="bg-zinc-800 h-full flex text-slate-50">
       <Outlet />
     </main>
-    <footer className="bg-zinc-900 text-white flex p-4 justify-center flex-row">
+    <footer className="bg-zinc-900 text-white flex py-3 justify-center flex-row">
       Criado por
       <a
         className="text-gray-300 flex ml-1 hover:text-gray-50 items-center"

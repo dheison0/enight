@@ -11,7 +11,7 @@ const NewLink = (title: string, path: string, Icon: ElementType) => (
 )
 
 const links = [
-  NewLink("Pedidos", "orders", ShoppingCart),
+  NewLink("Pedidos", "/admin", ShoppingCart),
   NewLink("Produtos", "products", Pizza),
   NewLink("Clientes", "clients", UsersRound),
   NewLink("Locais", "locations", MapPin),
@@ -20,6 +20,7 @@ const links = [
 
 const AdminBase = () => {
   const isLogged = useLoaderData() as boolean
+  console.log("Está logado? ", isLogged)
   if (isLogged) {
     return (
       <div className="flex flex-1 flex-row">

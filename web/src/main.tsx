@@ -5,16 +5,20 @@ import Base from './base.tsx'
 import './index.css'
 import AdminBase from './pages/admin/base.tsx'
 import Orders from './pages/admin/orders/index.tsx'
-import Login from './pages/admin/login/index.tsx'
 import Home from './pages/home.tsx'
 import { loader as adminBaseLoader } from './pages/admin/actions.tsx'
+import { Locations } from './pages/admin/locations/index.tsx'
+import { NewLocation } from './pages/admin/locations/new/index.tsx'
+import { Clients } from './pages/admin/clients/index.tsx'
 
 const router = createBrowserRouter(createRoutesFromElements(
   <Route element={<Base />} path="/">
     <Route index={true} element={<Home />} />
     <Route path="admin" element={<AdminBase />} loader={adminBaseLoader}>
-      <Route index={true} element={<Login />} />
-      <Route path="orders" element={<Orders />} />
+      <Route index={true} element={<Orders />} />
+      <Route path="locations" element={<Locations />} />
+      <Route path="locations/new" element={<NewLocation />} />
+      <Route path="clients" element={<Clients />} />
     </Route>
   </Route>
 ))
