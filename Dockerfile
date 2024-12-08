@@ -1,15 +1,21 @@
-FROM node:20.18-alpine3.20 AS web
-WORKDIR /web
-COPY web .
-RUN npm install && npm run build
+ARG ALPINE_VERSION=3.20
 
-FROM golang:1.23-alpine3.20 AS server
-RUN apk update && apk add gcc musl-dev
+FROM node:20.18-alpine${ALPINE_VERSION} AS web
+WORKDIR /web
+COPY web/package*.json ./
+RUN npm install -g npm@latest && npm install
+COPY web .
+RUN npm run build
+
+FROM golang:1.23-alpine${ALPINE_VERSION} AS server
 WORKDIR /server
+RUN apk update && apk add gcc musl-dev
+COPY server/go.mod server/go.sum ./
+RUN go mod download
 COPY server .
 RUN CGO_ENABLED=1 go build -ldflags="-w -s" -o server
 
-FROM alpine:3.20 AS app
+FROM alpine:${ALPINE_VERSION} AS app
 WORKDIR /app
 VOLUME [ "/data" ]
 COPY --from=web /web/dist /app/web
