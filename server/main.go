@@ -15,8 +15,10 @@ func main() {
 
 	database.Init()
 	defer database.Close()
-	bot.Start(debug)
-	defer bot.Stop()
+	if os.Getenv("DISABLE_BOT") != "true" {
+		bot.Start(debug)
+		defer bot.Stop()
+	}
 	if err := api.Start(debug); err != nil {
 		panic(err)
 	}
