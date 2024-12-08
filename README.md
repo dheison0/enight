@@ -54,4 +54,5 @@ sistema, elas podem ser definidas em um arquivo `.env` que sera carregado:
     "false" desativa);
   - `JWT_TOKEN` Pode ser usado durante o desenvolvimento para evitar a
     nessecidade de refazer o login toda vez que o sistema é reiniciado já que
-    se não definido é usado um token aleatório.
+    se não definido é usado um token aleatório;
+  - `VITE_WHATSAPP_PHONE` Número de telefone para contato no WhatsApp(normalmente o do bot).
