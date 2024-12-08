@@ -11,14 +11,14 @@ func CreateClient(client *models.ClientDatabase) error {
 }
 
 func GetAllClients() ([]models.ClientDatabase, error) {
-	rows, err := db.Query("SELECT phone, name, location_id FROM clients;")
+	rows, err := db.Query("SELECT phone, name, location_id, created_at FROM clients;")
 	if err != nil {
 		return nil, err
 	}
 	var client models.ClientDatabase
 	clients := []models.ClientDatabase{}
 	for rows.Next() {
-		err := rows.Scan(&client.Phone, &client.Name, &client.LocationID)
+		err := rows.Scan(&client.Phone, &client.Name, &client.LocationID, &client.CreatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -30,12 +30,12 @@ func GetAllClients() ([]models.ClientDatabase, error) {
 func GetClient(phone string) (*models.ClientResponse, error) {
 	clientResponse := models.ClientResponse{Phone: phone}
 	err := db.QueryRow(
-		`SELECT clients.name, locations.id, locations.name, locations.distance
+		`SELECT clients.name, clients.created_at, locations.id, locations.name, locations.distance
 		 FROM clients INNER JOIN locations ON locations.id = clients.location_id
 		 WHERE clients.phone = ?;`,
 		phone,
 	).Scan(
-		&clientResponse.Name, &clientResponse.Location.ID,
+		&clientResponse.Name, &clientResponse.CreatedAt, &clientResponse.Location.ID,
 		&clientResponse.Location.Name, &clientResponse.Location.Distance,
 	)
 	if err != nil {

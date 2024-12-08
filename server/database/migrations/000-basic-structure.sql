@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS clients(
   phone TEXT PRIMARY KEY NOT NULL,
   name TEXT NOT NULL,
   location_id INTEGER,
+  created_at INTEGER NOT NULL DEFAULT (unixepoch()),
   FOREIGN KEY(location_id) REFERENCES locations(id)
 );
 
@@ -15,7 +16,8 @@ CREATE TABLE IF NOT EXISTS products(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
   description TEXT,
-  cover_url TEXT
+  cover_url TEXT,
+  created_at INTEGER NOT NULL DEFAULT (unixepoch())
 );
 
 CREATE TABLE IF NOT EXISTS product_sizes(
