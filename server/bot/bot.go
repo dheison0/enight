@@ -11,6 +11,7 @@ import (
 	"go.mau.fi/whatsmeow/store"
 	"go.mau.fi/whatsmeow/store/sqlstore"
 	waLog "go.mau.fi/whatsmeow/util/log"
+  _ "modernc.org/sqlite"
 )
 
 var client *whatsmeow.Client
@@ -38,7 +39,7 @@ func setupDatabase(logLevel string) *sqlstore.Container {
 		botDBPath = "./bot.sqlite3"
 		log.Println("BOT_DB_PATH not provided, using ./bot.sqlite3")
 	}
-	container, err := sqlstore.New("sqlite3", fmt.Sprintf("file:%s?_foreign_keys=on", botDBPath), dbLog)
+	container, err := sqlstore.New("sqlite", fmt.Sprintf("file:%s?_pragma=foreign_keys(1)", botDBPath), dbLog)
 	if err != nil {
 		panic("failed to create bot database container! " + err.Error())
 	}

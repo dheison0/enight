@@ -9,7 +9,7 @@ import (
 	"log"
 	"os"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 const (
@@ -29,7 +29,7 @@ func Init() {
 		path = "./system.sqlite3"
 		log.Println("DB_PATH not provided, using ./system.sqlite3")
 	}
-	db, err = sql.Open("sqlite3", path)
+	db, err = sql.Open("sqlite", path)
 	if err != nil {
 		panic("Failed to open database! " + err.Error())
 	}

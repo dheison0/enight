@@ -9,11 +9,10 @@ RUN npm run build
 
 FROM golang:1.23-alpine${ALPINE_VERSION} AS server
 WORKDIR /server
-RUN apk update && apk add gcc musl-dev
 COPY server/go.mod server/go.sum ./
 RUN go mod download
 COPY server .
-RUN CGO_ENABLED=1 go build -ldflags="-w -s" -o server
+RUN CGO_ENABLED=0 go build -ldflags="-w -s" -o server
 
 FROM alpine:${ALPINE_VERSION} AS app
 WORKDIR /app
