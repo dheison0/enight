@@ -26,34 +26,10 @@ func Start(debug bool) error {
 		gzip.DefaultCompression,
 		gzip.WithExcludedPaths([]string{"/api/"}),
 	))
+	setupWebUI(server)
+	setupJWT()
 
-	jwtSecret := os.Getenv("JWT_SECRET")
-	if jwtSecret == "" {
-		jwtSecret = extra.RandomString(16)
-		log.Println("JWT_TOKEN not provided, using random secret")
-	}
-	routes.SetJwtSecret(jwtSecret)
-	server.NoRoute(func(c *gin.Context) {
-		c.JSON(http.StatusNotFound, gin.H{"error": "page not found"})
-	})
-
-	webFiles := os.Getenv("WEB_FILES_PATH")
-	if webFiles == "" {
-		log.Println("WEB_FILES_PATH not defined! Not serving WEB UI!")
-	} else {
-		server.Use(static.Serve("/", static.LocalFile(webFiles, true)))
-		server.NoRoute(func(c *gin.Context) {
-			if strings.Contains(c.Request.URL.Path, "/api") {
-				c.JSON(http.StatusNotFound, gin.H{"error": "page not found"})
-				return
-			}
-			c.Status(http.StatusOK)
-			c.File(path.Join(webFiles, "index.html"))
-		})
-	}
-
-	apiRoute := server.Group("/api")
-	registerAPIRoutes(apiRoute)
+	registerAPIRoutes(server.Group("/api"))
 	log.Println("Starting server...")
 	port := os.Getenv("SERVER_PORT")
 	if port == "" {
@@ -75,6 +51,38 @@ func Cors() gin.HandlerFunc {
 		}
 		c.Next()
 	}
+}
+
+func setupWebUI(server *gin.Engine) {
+	webFiles := os.Getenv("WEB_FILES_PATH")
+	if webFiles == "" {
+		webFiles = "./www"
+		log.Printf("WEB_FILES_PATH not defined! Using default %s\n", webFiles)
+	}
+	indexPath := path.Join(webFiles, "index.html")
+	if _, err := os.Stat(indexPath); err == nil {
+		server.Use(static.Serve("/", static.LocalFile(webFiles, true)))
+		server.NoRoute(func(c *gin.Context) {
+			if strings.Contains(c.Request.URL.Path, "/api") {
+				noRoute(c)
+				return
+			}
+			c.Status(http.StatusOK)
+			c.File(indexPath)
+		})
+	} else {
+		log.Println("Web files not found, web ui disabled!")
+		server.NoRoute(noRoute)
+	}
+}
+
+func setupJWT() {
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		jwtSecret = extra.RandomString(16)
+		log.Println("JWT_SECRET not provided, using random secret")
+	}
+	routes.SetJwtSecret(jwtSecret)
 }
 
 func registerAPIRoutes(g *gin.RouterGroup) {
@@ -105,4 +113,8 @@ func registerAPIRoutes(g *gin.RouterGroup) {
 	g.PUT("/purchases/:id", routes.AuthMiddleware, routes.SetPurchaseStage)
 
 	g.GET("/tokens/:id", routes.GetTokenUser)
+}
+
+func noRoute(c *gin.Context) {
+	c.JSON(http.StatusNotFound, gin.H{"error": "page not found"})
 }

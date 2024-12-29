@@ -2,25 +2,24 @@
 
 ROOT=$(dirname "$(realpath "$0")")
 ROOT=$(realpath "$ROOT")
+TMP_DIR="$ROOT/tmp"
 
-log() {
+function log() {
   echo -e "[`date +%H:%M:%S`] $@"
 }
 
-log "Building all system..."
-if [ $(nproc) -gt 2 ]; then
-  cd "$ROOT/web"
-  npm run build &>/dev/null &
-fi
-cd "$ROOT/server"
-CGO_ENABLED=1 go build -ldflags="-extldflags=-w -s" || exit
+mkdir "$TMP_DIR" &>/dev/null
 
+if [ $(nproc) -gt 2 ] || [ "$1" == "build-web" ]; then
+  log "Building web..."
+  cd "$ROOT/web"
+  time npm run build -- --emptyOutDir --outDir "$TMP_DIR/www"
+fi
+log "Building server..."
+cd "$ROOT/server"
+CGO_ENABLED=0 time go build -ldflags="-w -s" -v -o "$TMP_DIR/server" || exit
 
 log "Running server..."
-mkdir "$ROOT/tmp"
-export WEB_FILES_PATH="$ROOT/web/dist"
-export DB_PATH="$ROOT/tmp/system.sqlite3"
-export BOT_DB_PATH="$ROOT/tmp/bot.sqlite3"
 export DEBUG=true
-cd "$ROOT"
-exec "$ROOT/server/server"
+cd "$TMP_DIR"
+exec "./server"

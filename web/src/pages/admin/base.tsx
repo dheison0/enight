@@ -4,7 +4,7 @@ import { Link, Outlet, useLoaderData } from "react-router-dom"
 import Login from "./login"
 
 const NewLink = (title: string, path: string, Icon: ElementType) => (
-  <Link key={path} to={path} className="flex my-1 p-2 rounded-lg hover:bg-zinc-800">
+  <Link key={path} to={path} className="flex my-1 p-2 rounded-lg hover:bg-zinc-800 items-center">
     <Icon className="mr-2" />
     <span>{title}</span>
   </Link>
@@ -20,7 +20,6 @@ const links = [
 
 const AdminBase = () => {
   const isLogged = useLoaderData() as boolean
-  console.log("Está logado? ", isLogged)
   if (isLogged) {
     return (
       <div className="flex flex-1 flex-row">
