@@ -17,7 +17,7 @@ if [ $(nproc) -gt 2 ] || [ "$1" == "build-web" ]; then
 fi
 log "Building server..."
 cd "$ROOT/server"
-CGO_ENABLED=0 time go build -ldflags="-w -s" -v -o "$TMP_DIR/server" || exit
+CGO_ENABLED=0 go build -ldflags="-w -s" -v -o "$TMP_DIR/server" || exit
 
 log "Running server..."
 export DEBUG=true
