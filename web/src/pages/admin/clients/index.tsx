@@ -3,7 +3,7 @@ import { Client } from "../../../types"
 import { Loading } from "../../../components/Loading"
 import { getAllClients } from "../../../api"
 import { default as dayjs } from "dayjs"
-import {Link} from "react-router-dom"
+import { Link } from "react-router-dom"
 import { parsePhoneNumber } from "libphonenumber-js/min"
 import { Search } from "lucide-react"
 import "dayjs/locale/pt-br"
@@ -25,7 +25,7 @@ export function Clients() {
         if ("error" in response) {
           console.warn("erro" + response.error)
         } else if (status == 200) {
-          for (let client of response) {
+          for (const client of response) {
             const key = `${client.name}${client.phone}`.replace(" ", "").toLowerCase()
             allClients.current[key] = client
           }
@@ -42,7 +42,7 @@ export function Clients() {
   const search = () => {
     const query = searchInputRef.current!.value.replace(" ", "").toLowerCase()
     const toShow: Client[] = []
-    for (let key in allClients.current) {
+    for (const key in allClients.current) {
       if (key.includes(query)) {
         toShow.push(allClients.current[key])
       }

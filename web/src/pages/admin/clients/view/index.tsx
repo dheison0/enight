@@ -15,7 +15,7 @@ export function ClientView() {
 
   useEffect(() => {
     getClient(phone!)
-      .then(([_, response]) => {
+      .then(([, response]) => {
         if ("error" in response) {
           console.log("deu erro", response.error)
         } else {
@@ -23,7 +23,7 @@ export function ClientView() {
           setLoading(false)
         }
       })
-  }, [])
+  }, [phone])
 
   if (loading) {
     return <Loading message="Carregando informações básicas do cliente..." />

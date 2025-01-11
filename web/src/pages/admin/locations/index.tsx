@@ -10,8 +10,12 @@ export function Locations() {
   const [locations, setLocations] = useState<Location[]>([])
   useEffect(() => {
     getLocations()
-      .then((data) => {
-        setLocations(data)
+      .then(([status, response]) => {
+        if ("error" in response || status != 200) {
+          console.log("Deu erro", response)
+          return
+        }
+        setLocations(response)
         setLoading(false)
       }) // TODO: Add error handler
       .catch(err => console.warn("getting locations", err))
