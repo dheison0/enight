@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 	"server/api"
 	"server/bot"
@@ -10,7 +11,9 @@ import (
 )
 
 func main() {
-	godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		log.Println(".env file not loaded")
+	}
 	debug := os.Getenv("DEBUG") == "true"
 
 	database.Init()
