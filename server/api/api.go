@@ -1,7 +1,7 @@
 package api
 
 import (
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"path"
@@ -16,7 +16,7 @@ import (
 
 // Start configures server and add routes, then start
 func Start(debug bool) error {
-	log.Println("Creating server...")
+	slog.Info("Creating server...")
 	if !debug {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -30,11 +30,11 @@ func Start(debug bool) error {
 	setupJWT()
 
 	registerAPIRoutes(server.Group("/api"))
-	log.Println("Starting server...")
+	slog.Info("Starting server...")
 	port := os.Getenv("SERVER_PORT")
 	if port == "" {
 		port = "8080"
-		log.Println("SERVER_PORT not provided, using 8080")
+		slog.Warn("SERVER_PORT not provided, using default!", slog.String("port", port))
 	}
 	return server.Run(":" + port)
 }
@@ -57,7 +57,7 @@ func setupWebUI(server *gin.Engine) {
 	webFiles := os.Getenv("WEB_FILES_PATH")
 	if webFiles == "" {
 		webFiles = "./www"
-		log.Printf("WEB_FILES_PATH not defined! Using default %s\n", webFiles)
+		slog.Warn("WEB_FILES_PATH not defined! Using default!", slog.String("webFiles", webFiles))
 	}
 	indexPath := path.Join(webFiles, "index.html")
 	if _, err := os.Stat(indexPath); err == nil {
@@ -71,7 +71,7 @@ func setupWebUI(server *gin.Engine) {
 			c.File(indexPath)
 		})
 	} else {
-		log.Println("Web files not found, web ui disabled!")
+		slog.Warn("Web files not found, web ui disabled!")
 		server.NoRoute(noRoute)
 	}
 }
@@ -80,7 +80,7 @@ func setupJWT() {
 	jwtSecret := os.Getenv("JWT_SECRET")
 	if jwtSecret == "" {
 		jwtSecret = extra.RandomString(16)
-		log.Println("JWT_SECRET not provided, using random secret")
+		slog.Warn("JWT_SECRET not provided, using random secret", slog.String("jwtSecret", jwtSecret))
 	}
 	routes.SetJwtSecret(jwtSecret)
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Loading } from "../../../components/Loading";
-import { getLocations } from "../../../api";
+import { getLocations, removeLocation } from "../../../api";
 import { Location } from '../../../types';
 import { Pencil, PlusCircle, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -20,6 +20,20 @@ export function Locations() {
       }) // TODO: Add error handler
       .catch(err => console.warn("getting locations", err))
   }, [])
+
+  const deleteLocation = (idx: number) => {
+    const proceed = window.confirm(`Você realmente deseja remover ${locations[idx].name} das localizações?`)
+    if (proceed) {
+      removeLocation(locations[idx].id!)
+        .then(([status]) => {
+          if (status == 200) {
+            locations.splice(idx, 1)
+            setLocations([...locations])
+          }
+        })
+    }
+  }
+
   return loading ?
     (<Loading message="Carregando localizações..." oneLine={true} />)
     : (
@@ -50,7 +64,7 @@ export function Locations() {
                 <td className="border border-zinc-700 pl-1">{location.name}</td>
                 <td className="border border-zinc-700 text-center">{location.distance}</td>
                 <td className="border border-zinc-700 text-center">
-                  <button className="p-1">
+                  <button className="p-1" onClick={() => deleteLocation(idx)}>
                     <Trash2 size={16} className="text-red-500" />
                   </button>
                   <button className="p-1">
@@ -61,7 +75,6 @@ export function Locations() {
             ))}
           </tbody>
         </table>
-
       </div>
     )
 }

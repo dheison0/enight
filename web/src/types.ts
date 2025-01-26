@@ -20,3 +20,9 @@ export type Client = {
   location_id?: number;
   location?: Location;
 }
+
+export type ProductSize = {
+  id?: number;
+  name: string;
+  price: number;
+}

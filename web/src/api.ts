@@ -45,5 +45,6 @@ export async function isAuthenticated(): Promise<boolean> {
 
 export const getLocations = async () => await request<Location[]>("GET", "/locations")
 export const addLocation = async (l: Location) => await request<Location>("POST", "/locations", l)
+export const removeLocation = async (id: number) => await request<null>("DELETE", `/locations/${id}`)
 export const getAllClients = async () => await request<Client[]>("GET", "/clients")
 export const getClient = async (phone: string) => await request<Client>("GET", "/clients/" + phone)

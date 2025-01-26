@@ -2,7 +2,7 @@ package bot
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"server/database"
 	"server/extra"
 	"server/models"
@@ -116,7 +116,7 @@ func RegisterNewClient(m *events.Message) {
 		locations, err := database.GetAllLocations()
 		if err != nil {
 			sendText(m, true, "Houve um erro ao buscar as localizações. Tente novamente mais tarde.")
-			log.Print("Error getting locations: " + err.Error())
+			slog.Warn("Error getting locations", slog.String("error", err.Error()))
 			return
 		}
 		locationsString := ""

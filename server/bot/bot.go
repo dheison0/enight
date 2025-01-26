@@ -3,7 +3,7 @@ package bot
 import (
 	"context"
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 
 	"github.com/mdp/qrterminal"
@@ -17,7 +17,7 @@ import (
 var client *whatsmeow.Client
 
 func Start(debug bool) {
-	log.Println("Starting bot...")
+  slog.Info("Starting bot...")
 	// Initialize loggers
 	logLevel := "WARN"
 	if debug {
@@ -29,7 +29,7 @@ func Start(debug bool) {
 	}
 	client := setupWhatsappClient(logLevel, device)
 	client.AddEventHandler(EventHandler)
-	log.Println("Bot started!")
+	slog.Info("Bot started!")
 }
 
 func setupDatabase(logLevel string) *sqlstore.Container {
@@ -37,7 +37,7 @@ func setupDatabase(logLevel string) *sqlstore.Container {
 	botDBPath := os.Getenv("BOT_DB_PATH")
 	if botDBPath == "" {
 		botDBPath = "./bot.sqlite3"
-		log.Println("BOT_DB_PATH not provided, using ./bot.sqlite3")
+		slog.Warn("BOT_DB_PATH not provided, using default", slog.String("botDBPath", botDBPath))
 	}
 	container, err := sqlstore.New("sqlite", fmt.Sprintf("file:%s?_pragma=foreign_keys(1)", botDBPath), dbLog)
 	if err != nil {
@@ -74,6 +74,6 @@ func setupWhatsappClient(logLevel string, device *store.Device) *whatsmeow.Clien
 }
 
 func Stop() {
-	log.Println("Stopping bot...")
+	slog.Info("Stopping bot...")
 	client.Disconnect()
 }

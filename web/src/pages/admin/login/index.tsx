@@ -3,7 +3,7 @@ import { login } from "../../../api"
 
 const Login = () => {
   const passwordRef = useRef<HTMLInputElement>(null)
-  const [borderColor, setBorderColor] = useState("border-blue-200")
+  const [borderColor, setBorderColor] = useState("border-zinc-500")
   const [processing, setProcessing] = useState(false)
 
   const onLoginPress = () => {
@@ -25,7 +25,7 @@ const Login = () => {
 
   return (
     <div className="flex flex-1 items-center justify-center">
-      <div className="bg-zinc-600 p-4 rounded-lg">
+      <div className="bg-zinc-700 p-4 rounded-lg">
         <h1 className="flex flex-1 justify-center">
           Fazer login
         </h1>
@@ -33,11 +33,12 @@ const Login = () => {
           ref={passwordRef}
           placeholder="Senha..."
           type="password"
-          className={"m-2 p-1 rounded bg-zinc-500 border-2 " + borderColor}
+          className={"m-2 p-1 rounded-md bg-zinc-600 border-2 " + borderColor}
+          onKeyUp={e => e.key == "Enter" && onLoginPress()}
         />
         <button
-          className={"p-1 rounded " + (processing ? "bg-gray-500" : "bg-blue-500")}
-          disabled={processing ? true : false}
+          className={"p-1.5 rounded-lg " + (processing ? "bg-gray-500" : "bg-blue-600")}
+          disabled={processing}
           onClick={onLoginPress}
         >
           Entrar

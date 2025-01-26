@@ -6,7 +6,7 @@ import (
 	"embed"
 	"errors"
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 
 	_ "modernc.org/sqlite"
@@ -27,7 +27,7 @@ func Init() {
 	path := os.Getenv("DB_PATH")
 	if path == "" {
 		path = "./system.sqlite3"
-		log.Println("DB_PATH not provided, using ./system.sqlite3")
+		slog.Warn("DB_PATH not provided, using default", slog.String("systemDBPath", path))
 	}
 	db, err = sql.Open("sqlite", path)
 	if err != nil {
@@ -52,7 +52,7 @@ func runMigrations() error {
 		return errors.New("failed to read migrations directory! " + err.Error())
 	}
 	for _, file := range files {
-		log.Println("Running migration:", file.Name())
+		slog.Info("Running migration", slog.String("file", file.Name()))
 		data, err := migrations.ReadFile("migrations/" + file.Name())
 		if err != nil {
 			return errors.New("can't read migration file! " + err.Error())
@@ -71,7 +71,7 @@ func insertInitialValues() error {
 		return err
 	}
 	if settings.PasswordHash == "" {
-		log.Println("Inserting settings into database...")
+		slog.Info("Inserting settings into database...")
 		hash := sha256.Sum256([]byte(DEFAULT_PASSWORD))
 		_, err = db.Exec(
 			"INSERT INTO settings(shipping_price, password_hash) VALUES(?, ?);",

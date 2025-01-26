@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"log/slog"
 	"os"
 	"server/api"
 	"server/bot"
@@ -10,9 +10,14 @@ import (
 	"github.com/joho/godotenv"
 )
 
+func init() {
+  logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+  slog.SetDefault(logger)
+}
+
 func main() {
 	if err := godotenv.Load(); err != nil {
-		log.Println(".env file not loaded")
+		slog.Info(".env file not loaded")
 	}
 	debug := os.Getenv("DEBUG") == "true"
 
